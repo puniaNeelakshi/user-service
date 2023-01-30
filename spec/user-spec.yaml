@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  version: "1.0"
+  title: User Service
+  description: >
+    # Introduction
+
+    This service gives information on user of our application.
+        
+    # Available authentication methods
+
+    Webhook Relay offers three forms of authentication:
+      - **Basic Auth** - only available for non-OAuth accounts. Use your username and password.
+      - **API Key** - available for all accounts, token pairs can be generated [here](https://my.webhookrelay.com/tokens)
+      - **JWT** - mainly used by the [admin dashboard](https://my.webhookrelay.com) with a 'Authorization Bearer: token' 
+
+    You can find Swagger and OpenAPI spec files here: [https://github.com/webhookrelay/swagger-webhookrelay](https://github.com/webhookrelay/swagger-webhookrelay).

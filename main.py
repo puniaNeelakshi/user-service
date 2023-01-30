@@ -4,11 +4,12 @@ app = Flask(__name__)
 
 
 @app.route('/users')
-def hello_world():  # put application's code here
+def hello_world():
     return jsonify({'userId': 42}), 200
 
+
 @app.route('/new/users')
-def hello_world1():  # put application's code here
+def hello_world1():
     return jsonify({'userId': 100}), 200
 
 

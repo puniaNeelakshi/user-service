@@ -15,3 +15,844 @@ info:
       - **JWT** - mainly used by the [admin dashboard](https://my.webhookrelay.com) with a 'Authorization Bearer: token' 
 
     You can find Swagger and OpenAPI spec files here: [https://github.com/webhookrelay/swagger-webhookrelay](https://github.com/webhookrelay/swagger-webhookrelay).
+  termsOfService: https://webhookrelay.com/tos/
+  contact:
+    email: support@webhookrelay.com
+externalDocs:
+  description: Find out more in the official documentation.
+  url: https://webhookrelay.com/v1/guide/
+tags:
+  - name: Tokens
+    description: Token key & secret pairs are used to authenticate your API calls or for
+      agents to subscribe to webhook forwarding or open tunnels.
+  - name: Buckets
+    description: Input and output grouping. Bucket allows to have multiple endpoints for
+      the same destination or multiple destinations for fan-out style webhook
+      forwarding.
+  - name: Outputs
+    description: Outputs are destinations, where your webhooks will be forwarded. Public
+      destinations do not require agents to be running. Internal outputs will
+      not work without an agent.
+  - name: Inputs
+    description: "Inputs are your public endpoints. Each input serves as an inbox that you
+      can supply to your webhooks producer (ie: Github, Docker, IFTTT)"
+  - name: Logs
+    description: Webhook logs hold the status of received and forwarded webhooks. You can
+      use this API group to resend webhooks to one or more destinations
+  - name: Functions
+    description: >
+      Webhook Relay Functions provide an easy way to extract values from
+      webhooks and transform HTTP
+
+      requests before passing them to their final destination. Function can be reused by any number
+
+      of Inputs and/or Outputs. Since user doesn’t have to run a server, this type of function service
+
+      is also known as FaaS (Function as a Service) or Serverless.
+
+
+      Read more about functions here: https://webhookrelay.com/v1/guide/functions.
+
+
+      Basic function examples can be found here: https://webhookrelay.com/v1/examples/manipulating-request-body.
+  - name: Tunnels
+    description: >
+      Tunnels allow remote access to internal web services such as local
+      Wordpress, Jekyll or Hexo. Recommended `crypto` options are `flexible` or
+      `tls-pass-through`.
+x-tagGroups:
+  - name: Authentication
+    tags:
+      - Tokens
+  - name: Webhook Forwarding
+    tags:
+      - Buckets
+      - Outputs
+      - Inputs
+      - Logs
+      - Functions
+  - name: Tunneling
+    tags:
+      - Tunnels
+paths:
+  /v1/tunnels:
+    get:
+      tags:
+        - Tunnels
+      summary: List All Tunnels
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tunnel"
+              examples:
+                response:
+                  value:
+                    - id: b3237483-e96e-4f3a-905c-0d9603d66c1f
+                      created_at: 1534409264
+                      updated_at: 1534409264
+                      name: tunnel-x
+                      destination: http://localhost:4000
+                      host: tunnelx.webrelay.io
+    post:
+      tags:
+        - Tunnels
+      description: You may create your own tunnel using this action. It takes a JSON object
+        containing a tunnel request with a specified destination. Paid plans
+        have an option to specify either encryption, subdomain or full domain.
+      summary: Create a New Tunnel
+      requestBody:
+        $ref: "#/components/requestBodies/Tunnel"
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tunnel"
+              examples:
+                response:
+                  value:
+                    id: b3237483-e96e-4f3a-905c-0d9603d66c1f
+                    created_at: 1534409264
+                    updated_at: 1534409264
+                    name: tunnel-x
+                    destination: http://localhost:4000
+                    host: tunnelx.webrelay.io
+            description:
+              examples:
+                response:
+                  value: Create a tunnel with a custom subdomain
+        "400":
+          description: Invalid tunnel request supplied
+    summary: List and create tunnels
+  "/v1/tunnels/{tunnelID}":
+    parameters:
+      - name: tunnelID
+        in: path
+        description: ID of tunnel to return
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Tunnels
+      summary: Get Tunnel Details
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tunnel"
+              examples:
+                response:
+                  value:
+                    created_at: 1534409264
+                    updated_at: 1534409264
+                    id: b3237483-e96e-4f3a-905c-0d9603d66c1f
+                    destination: http://localhost:8090
+                    name: tunnel
+                    group: ""
+                    addr: ""
+                    host: tunnelx.webrelay.io
+                    mode: active
+                    protocol: http
+                    account_id: bd7e1dfc-54c8-408c-a885-7498bf1d8522
+                    description: ""
+                    features: null
+                    auth:
+                      created_at: 1534409264
+                      updated_at: 1534409264
+                      id: eb3fbc49-0713-48b1-8971-a7c4a9c64dfb
+                      type: none
+                    agent_id: ""
+                    ingress_rules: null
+                    crypto: off
+        "404":
+          description: Tunnel not found
+    put:
+      tags:
+        - Tunnels
+      summary: Update Tunnel Details
+      requestBody:
+        $ref: "#/components/requestBodies/Tunnel"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tunnel"
+              examples:
+                response:
+                  value:
+                    created_at: 1534409264
+                    updated_at: 1534409264
+                    id: b3237483-e96e-4f3a-905c-0d9603d66c1f
+                    destination: http://localhost:8090
+                    name: tunnel
+                    group: ""
+                    addr: ""
+                    host: tunnelx.webrelay.io
+                    mode: active
+                    protocol: http
+                    account_id: bd7e1dfc-54c8-408c-a885-7498bf1d8522
+                    description: ""
+                    features: null
+                    auth:
+                      created_at: 1534409264
+                      updated_at: 1534409264
+                      id: eb3fbc49-0713-48b1-8971-a7c4a9c64dfb
+                      type: none
+                    agent_id: ""
+                    ingress_rules: null
+                    crypto: off
+        "400":
+          description: Bad request (check response message)
+        "404":
+          description: Tunnel not found
+    delete:
+      tags:
+        - Tunnels
+      summary: Delete Tunnel
+      responses:
+        "200":
+          description: Successful Response
+        "404":
+          description: Tunnel not found
+        summary: Get, update and delete tunnels
+
+    post:
+      tags:
+        - Tokens
+      summary: Create a New Authentication Token
+      requestBody:
+        $ref: "#/components/requestBodies/Token"
+      responses:
+        "201":
+          description: Create a new token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenCreateResponse"
+              examples:
+                response:
+                  value:
+                    key: cc58c9ea-5fa7-466e-91dc-5c08d0b1127c
+                    secret: very-secret
+        "400":
+          description: ""
+    summary: List and create tunnels
+
+components:
+  requestBodies:
+    Token:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Token"
+      required: true
+    Tunnel:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tunnel"
+      required: true
+    Input:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Input"
+      required: true
+    Output:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Output"
+      required: true
+    FunctionRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FunctionRequest"
+      required: true
+  schemas:
+    Tunnel:
+      title: Tunnel
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        destination:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+          enum:
+            - ""
+            - us-west
+            - eu
+            - au
+          description: Tunnel region
+          example: au
+        group:
+          type: string
+          description: Groups allow agents to subscribe to one or more tunnels
+        host:
+          type: string
+        protocol:
+          type: string
+        description:
+          type: string
+        auth:
+          $ref: "#/components/schemas/TunnelAuth"
+        crypto:
+          enum:
+            - off
+            - flexible
+            - full
+            - full-strict
+            - tls-pass-through
+          type: string
+          description: Tunnel encryption type
+          example: flexible
+      example:
+        created_at: 1534409264
+        updated_at: 1534409264
+        id: b3237483-e96e-4f3a-905c-0d9603d66c1f
+        destination: http://localhost:8090
+        name: tunnel
+        group: ""
+        addr: ""
+        host: tunnelx.webrelay.io
+        protocol: http
+        account_id: bd7e1dfc-54c8-408c-a885-7498bf1d8522
+        description: ""
+        features: null
+        auth:
+          created_at: 1534409264
+          updated_at: 1534409264
+          id: eb3fbc49-0713-48b1-8971-a7c4a9c64dfb
+          type: none
+        agent_id: ""
+        ingress_rules: null
+        crypto: off
+    TunnelAuth:
+      title: Tunnel Authentication
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        token:
+          type: string
+    Token:
+      title: Token
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        last_login:
+          type: string
+          readOnly: true
+        api_access:
+          type: string
+          enum:
+            - disabled
+            - enabled
+          description: Enable/disable API access. If disabled, it can only be used to open
+            tunnel connections or forward webhooks but not change any existing
+            configuration
+          example: enabled
+        description:
+          type: string
+        scopes:
+          $ref: "#/components/schemas/TokenScopes"
+    TokenCreateResponse:
+      title: Token Create Response
+      type: object
+      properties:
+        key:
+          type: string
+          description: Token key, this is an alias to token ID
+        secret:
+          type: string
+          description: This is the only time secret is revealed as it is already encrypted
+            by the system
+    TokenScopes:
+      title: TokenScopes
+      type: object
+      properties:
+        tunnels:
+          type: array
+          items:
+            type: string
+        buckets:
+          type: array
+          items:
+            type: string
+    HeaderItem:
+      title: Header values
+      type: array
+      items:
+        type: string
+    Headers:
+      title: Headers for request/response
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/HeaderItem"
+      description: A hashmap of header keys and a list of values for each string, Go
+        equivalent map[string][]string
+      example:
+        Content-Type:
+          - JSON
+        Foo:
+          - Bar
+    BucketRequest:
+      title: Bucket create request
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    Bucket:
+      title: Bucket
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        suspended:
+          type: boolean
+          readOnly: true
+          description: Indicates that webhooks will not be received due to quota limits
+        stream:
+          type: boolean
+          description: Enable/disabled streaming to WebSocket clients from this bucket
+        ephemeral:
+          type: boolean
+          description: If ephemeral is enabled, Webhook Relay will not persist request
+            body, headers or response details
+        auth:
+          $ref: "#/components/schemas/BucketAuth"
+        inputs:
+          type: array
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/Input"
+        outputs:
+          type: array
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/Output"
+    BucketAuth:
+      title: BucketAuth
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        token:
+          type: string
+    Input:
+      title: Input
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        function_id:
+          type: string
+          description: ID of the function that will be executed for this input
+        headers:
+          $ref: "#/components/schemas/Headers"
+        status_code:
+          type: integer
+          description: Response status code to return when this input receives a webhook
+        body:
+          type: string
+          description: Response body to return when this input receives a webhook
+        response_from_output:
+          type: string
+          description: Output ID to specify a single output for response or set it to
+            'anyOutput' to return response from any output. Output should
+            respond within 10 seconds
+        custom_domain:
+          type: string
+          description: Specify any custom domain from your Reserved Domains, such as
+            example.hooks.webhookrelay.com or hooks.example.com (if used with
+            your own top level domain name, create a CNAME pointing at
+            hooks.webhookrelay.com)
+        path_prefix:
+          type: string
+          description: When used with custom domains, path_prefix can host multiple input
+            endpoints on a single domain, such as hooks.example.com/github ->
+            Jenkins CI, hooks.example.com/gitlab -> Spinnaker
+        description:
+          type: string
+    AndRule:
+      title: And Rule
+      type: array
+      items:
+        $ref: "#/components/schemas/Rules"
+    OrRule:
+      title: Or Rule
+      type: array
+      items:
+        $ref: "#/components/schemas/Rules"
+    NotRule:
+      title: Not Rule
+      type: array
+      items:
+        $ref: "#/components/schemas/Rules"
+    MatchRule:
+      title: Match Rule
+      type: object
+      properties:
+        parameter:
+          $ref: "#/components/schemas/RuleParameter"
+        type:
+          type: string
+          enum:
+            - value
+            - contains
+            - does-not-contain
+            - regex
+            - payload-hash-sha1
+            - payload-hash-sha256
+        value:
+          type: string
+        substring:
+          type: string
+        regex:
+          type: string
+        secret:
+          type: string
+    Rules:
+      title: Rules
+      type: object
+      properties:
+        and:
+          $ref: "#/components/schemas/AndRule"
+        or:
+          $ref: "#/components/schemas/OrRule"
+        not:
+          $ref: "#/components/schemas/NotRule"
+        match:
+          $ref: "#/components/schemas/MatchRule"
+    RuleParameter:
+      title: RuleParameter
+      type: object
+      properties:
+        name:
+          type: string
+        source:
+          type: string
+          enum:
+            - header
+            - payload
+            - query
+    Output:
+      title: Output
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        bucket_id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        disabled:
+          type: boolean
+          description: Allows to disable specific output destination without deleting the
+            output itself.
+        internal:
+          type: boolean
+          description: When internal output receives webhook, it forwards it to any
+            connected agent (relay CLI, Docker agent or WebSocket connection)
+        tls_verification:
+          type: boolean
+          description: Enforce TLS verification where possible (internal and public
+            destinations)
+        destination:
+          type: string
+          description: Destination, where to forward the webhook, such as
+            'http://localhost:4000'
+        headers:
+          $ref: "#/components/schemas/Headers"
+        rules:
+          $ref: "#/components/schemas/Rules"
+        timeout:
+          type: integer
+          description: Timeout in seconds, value between 0 and 180
+        description:
+          type: string
+        function_id:
+          type: string
+          description: ID of the function that will be executed for this output
+    LogAction:
+      title: Webhook Log Action
+      type: object
+      properties:
+        action:
+          type: string
+          description: Log action, for example 'resend'
+        output:
+          type: string
+          description: Optional, only set to an output ID if you want to resend this log to
+            the specific output instead of all bucket outputs
+    Response:
+      title: Action response
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the object
+        status:
+          type: string
+          description: Status of the action
+    LogsResponse:
+      title: Logs API response
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Log"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    Log:
+      title: Webhook Log
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: integer
+          readOnly: true
+        bucket_id:
+          type: string
+          readOnly: true
+        input_id:
+          type: string
+          readOnly: true
+        output_id:
+          type: string
+          readOnly: true
+        internal:
+          type: boolean
+          description: When internal output receives webhook, it forwards it to any
+            connected agent (relay CLI, Docker agent or WebSocket connection)
+        status_code:
+          type: integer
+        response_body:
+          type: string
+        response_headers:
+          $ref: "#/components/schemas/Headers"
+        status:
+          type: string
+          description: Request status, example values 'preparing', 'sent', 'failed',
+            'stalled', 'received', 'rejected'
+        retries:
+          type: integer
+          description: Retries taken so far
+        headers:
+          $ref: "#/components/schemas/Headers"
+        raw_query:
+          type: string
+          description: raw query for example request to http://example.com?foo=bar is
+            foo=bar
+        method:
+          type: string
+        body:
+          type: string
+        ephemeral:
+          type: boolean
+          description: This field is inherited from the bucket, if set - request/response
+            body will not be set
+    FunctionRequest:
+      title: Create/update function request
+      type: object
+      properties:
+        name:
+          type: string
+        payload:
+          type: string
+          description: base64 encoded function payload
+        driver:
+          type: string
+          description: Driver name (Lua, WASI)
+    Function:
+      title: Function
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created:
+          type: integer
+          readOnly: true
+        updated:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        payload:
+          type: string
+          description: base64 encoded function body
+        payload_size:
+          type: integer
+          readOnly: true
+        compression:
+          type: string
+          readOnly: true
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+    Domain:
+      title: Reserved Domain
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created:
+          type: integer
+          readOnly: true
+        updated:
+          type: integer
+          readOnly: true
+        domain:
+          type: string
+          description: Name of the domain to reserve, for example
+            joe.hooks.webhookrelay.com, hooks.example.com, tunnel.mydomain.com,
+            etc.
+    IntegrationConfiguration:
+      title: Integration Configuration
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created:
+          type: integer
+          readOnly: true
+        updated:
+          type: integer
+          readOnly: true
+        buckets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bucket"
+        disabled:
+          type: boolean
+          description: Disable/enable notification configuration. Consistently failing
+            configurations will be disabled
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - forwarding.function.error
+              - forwarding.delivery.error
+          description: "Event types, currently supported are: 'forwarding.function.error'
+            for failed functions and 'forwarding.delivery.error' for failed
+            webhook delivery. Learn more here
+            https://webhookrelay.com/v1/guide/integrations"
+        plugin:
+          type: string
+          enum:
+            - slack
+            - webhook
+          description: "Plugin to use, more info about webhook plugin can be found in the
+            docs here: https://webhookrelay.com/v1/guide/integrations#Webhook"
+        status:
+          type: string
+          description: Plugin status
+          readOnly: true
+        message:
+          type: string
+          description: Status description
+        description:
+          type: string
+          description: Free form description field

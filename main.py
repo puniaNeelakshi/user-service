@@ -1,17 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask
+
+from controller import TeacherAPI
+from student import student_api
 
 app = Flask(__name__)
-
-
-@app.route('/users')
-def hello_world():
-    return jsonify({'userId': 42}), 200
-
-
-@app.route('/new/users')
-def hello_world1():
-    return jsonify({'userId': 100}), 200
-
+app.register_blueprint(student_api)
+app.register_blueprint(TeacherAPI.teacher_api)
 
 if __name__ == '__main__':
     app.run()
